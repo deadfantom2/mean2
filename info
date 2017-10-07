@@ -1,0 +1,44 @@
+1)npm install express --save
+2)npm install -g nodemon
+3)npm install morgan --save
+4)npm install mongoose --save
+5)1st T => mongod --dbpath D:\data\db
+           mongod --dbpath E:\PC\Programs\MongoDB\Server\3.4\data\db
+6)2nd T => mongo
+7)npm install body-parser --save
+8)download Robomongo - for database dispaly
+9)npm install bcrypt-nodejs --save
+10)npm install jsonwebtoken --save
+11)npm install passport --save
+12)npm install express-session --save
+13)npm install passport-facebook --save
+14)npm install mongoose-title-case --save
+15)npm install mongoose-validator --save
+16)npm install nodemailer nodemailer-sendgrid-transport --save
+17)
+18)
+19)
+20)
+
+
+
+/*
+echo "# mean2" >> README.md
+git init
+git add README.md
+git add .
+git commit -m "first commit"
+git remote add origin https://github.com/deadfantom2/mean2.git
+git push -u origin master
+ */
+
+ /*
+ git add .
+ git commit -m "first commit"
+ git push -u origin master
+ */
+
+
+
+
+

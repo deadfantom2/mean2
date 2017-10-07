@@ -1,0 +1,74 @@
+<div class="page-header">
+    <h1>User management</h1>
+</div>
+
+<button type="button" class="btn btn btn-success" ng-click="management.showMore(number);">Apply filter</button>
+<button type="button" class="btn btn-warning" ng-click="management.showAll();">Show all</button>
+<div class="showmore">
+    <div class="col-lg-6">
+        <div class="input-group">
+            <span class="input-group-addon">Results to dispaly:</span>
+            <input type="text" class="form-control" ng-model="number">
+        </div>
+    </div>
+</div>
+
+
+<hr>
+<div class="row show-hide-message" ng-show="management.showMoreError">   <!-- ng-show montre le div dans notre cas -->
+    <div class="alert alert-danger">{{ management.showMoreError }}</div>   <!-- errorMsg declarer dans userCtrl.js -->
+</div>
+
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <strong>User management</strong>
+    </div>
+
+    <table class="table">
+        <tr>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Email</th>
+        </tr>
+        <tr ng-repeat="person in management.users | limitTo: management.limit">  <!-- boucle for, limitTo afficher nobmre quon a mis dans managementCtrl dans variable limit: notre cas 2 donc 2 lignes par pages -->
+            <td>{{ person.name }}</td>
+            <td>{{ person.username }}</td>
+            <td>{{ person.email }}</td>
+            <td>
+                <a href="/edit/{{person._id}}">
+                    <button type="button" class="btn btn-primary" ng-show="management.editAccess" >Edit</button>
+                </a>
+
+                <button type="button" class="btn btn-danger" ng-show="management.deleteAccess" ng-click="management.deleteUser(person.username);">Delete</button>
+
+            </td>
+        </tr>
+    </table>
+</div>
+
+
+<!-- Traitement... apres avoir clicker sur le bouton une icone qui apparait de spinner -->
+<div class="jumbotron text-center" ng-show="main.loading"> <!-- ng-show montre le div dans notre cas loading... -->
+    <span class="glyphicon glyphicon-repeat spinner"></span>
+    <p>Loading...</p>
+</div>
+
+<div class="row show-hide-message" ng-show="main.successMsg">   <!-- ng-show montre le div dans notre cas -->
+    <div class="alert alert-success">{{ main.successMsg }}</div>   <!-- successMsg declarer dans userCtrl.js -->
+</div>
+
+<div class="row show-hide-message" ng-show="main.errorMsg">   <!-- ng-show montre le div dans notre cas -->
+    <div class="alert alert-danger">{{ main.errorMsg }}</div>   <!-- errorMsg declarer dans userCtrl.js -->
+</div>
+
+
+
+
+
+
+
+
+
+
+

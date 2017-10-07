@@ -1,0 +1,48 @@
+<div class="page-header">
+    <h1>User Login</h1>
+</div>
+
+<!-- main on a declarer dans index.html dans tag body  -->
+<form ng-submit="main.doLogin(loginData);"> <!-- ng-submit meme chose que action, ici on appele function doLogin qui se trouve dans mainCtrl.js -->
+
+
+    <!-- ng-modal permet de recuperer donnees a partir de la form et passer dans le controller -->
+    <!-- Username -->
+    <label>Username:</label>
+    <input class="form-control" type="text" name="username" placeholder="please enter username" ng-model="main.loginData.username"> <!--  -->
+    <br>
+
+    <!-- Password -->
+    <label>Password:</label>
+    <input  class="form-control" type="password" name="password" placeholder="please enter password" ng-model="main.loginData.password"> <!--  -->
+    <br>
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+
+<br>
+
+
+<!-- Traitement... apres avoir clicker sur le bouton une icone qui apparait de spinner -->
+<div class="jumbotron text-center" ng-show="main.loading"> <!-- ng-show montre le div dans notre cas loading... -->
+    <span class="glyphicon glyphicon-repeat spinner"></span>
+    <p>Loading...</p>
+</div>
+
+<div class="row show-hide-message" ng-show="main.successMsg">   <!-- ng-show montre le div dans notre cas -->
+    <div class="alert alert-success">{{ main.successMsg }}</div>   <!-- successMsg declarer dans userCtrl.js -->
+</div>
+
+<div class="row show-hide-message" ng-show="main.errorMsg">   <!-- ng-show montre le div dans notre cas -->
+    <div class="alert alert-danger">{{ main.errorMsg }}</div>   <!-- errorMsg declarer dans userCtrl.js -->
+</div>
+
+
+
+
+
+
+
+
+
+
+
