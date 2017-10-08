@@ -4,6 +4,7 @@
 
 <button type="button" class="btn btn btn-success" ng-click="management.showMore(number);">Apply filter</button>
 <button type="button" class="btn btn-warning" ng-click="management.showAll();">Show all</button>
+
 <div class="showmore">
     <div class="col-lg-6">
         <div class="input-group">
@@ -11,6 +12,31 @@
             <input type="text" class="form-control" ng-model="number">
         </div>
     </div>
+</div>
+
+<!-- searchKeyword      searchFilter -->
+<div class="navbar-form">
+    <div class="form-group">
+        <input type="text" name="search" placeholder="search ..." ng-model="searchKeyword" class="form-control">
+    </div>
+    <button type="button" class="btn btn-default" ng-click="management.search(searchKeyword, number);">Search</button>
+    <button type="button" class="btn btn-default" ng-click="management.clear();">Clear</button>
+    <a href="/search">
+        <button type="button" class="btn btn-default">Advanced Search</button>
+    </a>
+</div>
+<br>
+
+<div ng-show="searchFilter != undefined">
+    <p><strong>Total results :
+        {{ (management.users | filter: searchFilter).length }}
+    </strong></p>
+</div>
+
+<div ng-show="searchFilter != undefined">
+    <p><strong>Currently displayed:
+        {{ (management.users | filter: searchFilter | limitTo: management.limit).length }}
+    </strong></p>
 </div>
 
 
@@ -31,7 +57,8 @@
             <th>Username</th>
             <th>Email</th>
         </tr>
-        <tr ng-repeat="person in management.users | limitTo: management.limit">  <!-- boucle for, limitTo afficher nobmre quon a mis dans managementCtrl dans variable limit: notre cas 2 donc 2 lignes par pages -->
+        <!-- filter: searchKeyword -->
+        <tr ng-repeat="person in management.users | filter: searchFilter | limitTo: management.limit">  <!-- boucle for, limitTo afficher nobmre quon a mis dans managementCtrl dans variable limit: notre cas 2 donc 2 lignes par pages -->
             <td>{{ person.name }}</td>
             <td>{{ person.username }}</td>
             <td>{{ person.email }}</td>

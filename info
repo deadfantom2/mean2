@@ -30,6 +30,8 @@ git add .
 git commit -m "first commit"
 git remote add origin https://github.com/deadfantom2/mean2.git
 git push -u origin master
+
+git push -f origin master
  */
 
  /*
@@ -38,6 +40,9 @@ git push -u origin master
  git push -u origin master
  */
 
+
+
+15:47
 
 
 
