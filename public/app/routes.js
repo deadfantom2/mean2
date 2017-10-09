@@ -41,6 +41,13 @@ var app = angular.module('appRoutes', ['ngRoute'])
         authenticated : true, // authenticated sera utiliser dans  le  bas middleware
         permission: ['admin', 'moderator'] //permission que pour admin ou moderator
     })
+    .when('/search', {
+        templateUrl: 'app/views/pages/management/search.html',
+        controller: 'managementCtrl',
+        controllerAs: 'management',   //nickname controller
+        authenticated : true, // authenticated sera utiliser dans  le  bas middleware
+        permission: ['admin', 'moderator'] //permission que pour admin ou moderator
+    })
     .otherwise({ redirectTo: '/'}); //si on ecrit plus de texte dans les path on redirige vers /
 
     // supprimer # dans le path angular

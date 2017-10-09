@@ -8,6 +8,7 @@ angular.module('managementController', [])
     app.editAccess = false; // Show edit button
     app.deleteAccess = false; // Show delete button
     app.limit = 2;
+    app.searchLimit = 0;
 
     function getUsers() {
         User.getUsers().then(function (datas) {
@@ -87,6 +88,29 @@ angular.module('managementController', [])
         $scope.searchKeyword = undefined;
         $scope.searchFilter = undefined;
         app.showMoreError = false;
+    };
+
+    // Function: Perform an advanced, criteria-based search
+    app.advancedSearch = function(searchByUsername, searchByEmail, searchByName) {
+        // Ensure only to perform advanced search if one of the fields was submitted
+        if (searchByUsername || searchByEmail || searchByName) {
+            $scope.advancedSearchFilter = {}; // Create the filter object
+            if (searchByUsername) {
+                $scope.advancedSearchFilter.username = searchByUsername; // If username keyword was provided, search by username
+            }
+            if (searchByEmail) {
+                $scope.advancedSearchFilter.email = searchByEmail; // If email keyword was provided, search by email
+            }
+            if (searchByName) {
+                $scope.advancedSearchFilter.name = searchByName; // If name keyword was provided, search by name
+            }
+            app.searchLimit = undefined; // Clear limit on search results
+        }
+    };
+
+    // Function: Set sort order of results
+    app.sortOrder = function(order) {
+        app.sort = order; // Assign sort order variable requested by user
     };
 
 })
