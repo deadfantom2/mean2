@@ -1,45 +1,48 @@
-var User = require('../models/user');
-var jwt = require('jsonwebtoken'); // sign with default (HMAC SHA256)
-var secret = 'lexx'; //pass secret in jwt
+var User    = require('../models/user');    // Import User Model
+var jwt     = require('jsonwebtoken');      // Import JWT Package
+var secret  = 'lexx';                       // Create custom secret for use in JWT
 
 module.exports = function(router) {
 
-    // User registration
+    // Route to register new users
     router.post('/users',function (req, res) {
-        var user = new User();
-            user.username = req.body.username;
-            user.password = req.body.password;
-            user.email = req.body.email;
-            user.name = req.body.name;
+        var user = new User();  // Create new User object
+            user.username = req.body.username; // Save username from request to User object
+            user.password = req.body.password; // Save password from request to User object
+            user.email = req.body.email; // Save email from request to User object
+            user.name = req.body.name; // Save name from request to User object
+        // Check if request is valid and not empty or null
         if(req.body.name == null || req.body.name == '' || req.body.username == null || req.body.username == '' || req.body.password == null || req.body.password == '' || req.body.email == null || req.body.email == ''){
             res.json({ success: false, message: 'Ensure username. email and password were provided'}); //dans data on a (message = selon le texte et success = tjrs false)
         }else{
+            // Save new user to database
             user.save(function(err) {
 
                 if(err){
+                    // Check if any validation errors exists (from user model)
                     if(err.errors != null){
                         if(err.errors.name ){
-                            res.json({ success: false, message: err.errors.name.message}); //dans data on a (message = selon le texte et success = tjrs false)
+                            res.json({ success: false, message: err.errors.name.message});      //dans data on a (message = selon le texte et success = tjrs false)
                         }else if(err.errors.email ){
-                            res.json({ success: false, message: err.errors.email.message});
+                            res.json({ success: false, message: err.errors.email.message});    // Display error in validation (email)
                         }else if(err.errors.username ){
-                            res.json({ success: false, message: err.errors.username.message});
+                            res.json({ success: false, message: err.errors.username.message}); // Display error in validation (username)
                         }else if(err.errors.password ){
-                            res.json({ success: false, message: err.errors.password.message});
+                            res.json({ success: false, message: err.errors.password.message}); // Display error in validation (password)
                         }else{
-                            res.json({ success: false, message: err});
+                            res.json({ success: false, message: err});                         // Display any other errors with validation
                         }
                     }else if(err){
+                        // Check if duplication error exists
                         if(err.code == 11000){ // 11000 signifie dans le code message error duplicate key
                             if(err.errmsg[58] == 'u'){
-                                res.json({ success: false, message: 'That username is already taken'});
+                                res.json({ success: false, message: 'That username is already taken'});     // Display error if username already taken
                             }else if(err.errmsg[58] == 'e'){
-                                res.json({ success: false, message: 'That e-mail is already taken'});
+                                res.json({ success: false, message: 'That e-mail is already taken'});       // Display error if e-mail already taken
                             }
                         }else{
-                            res.json({ success: false, message: err});
+                            res.json({ success: false, message: err});  // Display any other error
                         }
-
                     }
                 }else{
                     res.json({ success: true, message: 'User saved!'}); //dans data on a (message = selon le texte et success = tjrs false)
@@ -48,39 +51,40 @@ module.exports = function(router) {
         }
     });
 
-    // verifie dans la vue si username pris ou pas pris
+    // Route to check if username chosen on registration page is taken
     router.post('/checkusername',function (req, res) {
         //chercher user par son username et selectionner(afficher)  email username password
         User.findOne({ username: req.body.username }).select('username').exec(function (err, user) { //executer et s'il y a des erreurs on traite les erreurs
             if(err) throw err;
 
             if(user){
-                res.json({ success: false, message: 'The username already taken'});
+                res.json({ success: false, message: 'The username already taken'}); // If user is returned, then username is taken
             }else{
-                res.json({ success: true, message: 'Valid username'});
+                res.json({ success: true, message: 'Valid username'});              // If user is not returned, then username is not taken
             }
         });
     });
-    // verifie dans la vue si email pris ou pas pris
+    // Route to check if e-mail chosen on registration page is taken
     router.post('/checkemail',function (req, res) {
         //chercher user par son username et selectionner(afficher)  email username password
         User.findOne({ email: req.body.email }).select('email').exec(function (err, user) { //executer et s'il y a des erreurs on traite les erreurs
             if(err) throw err;
 
             if(user){
-                res.json({ success: false, message: 'The email already taken'});
+                res.json({ success: false, message: 'The email already taken'}); // If user is returned, then e-mail is taken
             }else{
-                res.json({ success: true, message: 'Valid email'});
+                res.json({ success: true, message: 'Valid email'});              // If user is not returned, then e-mail is not taken
             }
         });
     });
 
-    // User login
+    // Route for user logins
     router.post('/authenticate',function (req, res) {
         //chercher user par son username et selectionner(afficher)  email username password
        User.findOne({ username: req.body.username }).select('email username password').exec(function (err, user) { //executer et s'il y a des erreurs on traite les erreurs
            if(err) throw err;
 
+           // Check if user is found in the database (based on username)
            if(!user){ //si user n'exista pas
                res.json({ success: false, message: 'Could not authenticate user'}); //dans data on a (message = selon le texte et success = tjrs false)
            }else if(user){ //si user exista pas
@@ -92,25 +96,26 @@ module.exports = function(router) {
                if(!validPassword){ //si le password est mauvais
                    res.json({ success: false, message: 'Could not authenticate password'}); //message d'error
                }else{
-                   var token = jwt.sign({ username : user.username, email: user.email}, secret, { expiresIn: '1h' }); //toekn expire dans une heure
+                   var token = jwt.sign({ username : user.username, email: user.email}, secret, { expiresIn: '1h' }); // Logged in: Give user token, expire in 1h
                    res.json({ success: true, message: 'User authenticated !', token: token}); //message de success + token-expiration
                }
            }
        });
     });
 
+    // Middleware for Routes that checks for token - Place all routes after this route that require the user to already be logged in
     router.use(function (req, res, next) {
 
-        var token = req.body.token || req.body.query || req.headers['x-access-token'] ; // si le token est detecter on le verifie
-
-            if(token){ // si token existe
-                // verify a token symmetric
+        var token = req.body.token || req.body.query || req.headers['x-access-token'] ; // si le token est detecter on le verifie // Check for token in body, URL, or headers
+            // Check if token is valid and not expired
+            if(token){
+                // Function to verify token
                 jwt.verify(token, secret, function(err, decoded) {
                     if(err) {
-                        res.json({ success: false, message: 'Token invalid'});
+                        res.json({ success: false, message: 'Token invalid'});  // Token has expired or is invalid
                     }else{
-                        req.decoded = decoded;
-                        next();
+                        req.decoded = decoded; // Assign to req. variable to be able to use it in next() route ('/me' route)
+                        next(); // Required to leave middleware
                     }
                 });
             }else{
@@ -118,11 +123,12 @@ module.exports = function(router) {
             }
     });
 
+    // Route to get the currently logged in user
     router.post('/me', function (req, res) {
-        res.send(req.decoded);
+        res.send(req.decoded); // Return the token acquired from middleware
     });
 
-    // Route get pour voir users permissions
+    // Route to get the current user's permission level
     router.get('/permission', function (req, res) {
         User.findOne({ username: req.decoded.username}, function (err, user) {
             if(err) throw err; // Throw error if cannot connect
@@ -161,17 +167,21 @@ module.exports = function(router) {
         });
     });
 
+    // Route to delete a user
     router.delete('/management/:username', function (req, res) {
-        var deleteUser = req.params.username;
+        var deletedUser = req.params.username; // Assign the username from request parameters to a variable
         User.findOne({username: req.decoded.username}, function (err, mainUser) {
             if(err) throw err;
 
+            // Check if current user was found in database
             if(!mainUser){
                 res.json({success: false, message: 'No user found'});
             }else{
+                // Check if curent user has admin access
                 if(mainUser.permission != 'admin'){ // tous sauf admin
                     res.json({success: false, message: 'Insuffisant permission'});
                 }else{
+                    // Fine the user that needs to be deleted
                     User.findOneAndRemove({username: deleteUser}, function (err, user) {
                         if(err) throw err;
                         res.json({success: true});
@@ -181,19 +191,23 @@ module.exports = function(router) {
         });
     });
 
-
+    // Route to get the user that needs to be edited
     router.get('/edit/:id', function (req, res) {
-        var editUser = req.params.id;
+        var editUser = req.params.id; // Assign the _id from parameters to variable
 
         User.findOne({username: req.decoded.username}, function (err, mainUser) {
             if(err) throw err;
+            // Check if logged in user was found in database
             if(!mainUser){
                 res.json({success: false, message: 'No user found'});
             }else{
+                // Check if logged in user has editing privileges
                 if(mainUser.permission == 'admin' || mainUser.permission == 'moderator'){
+                    // Find the user to be editted
                     User.findOne({_id: editUser}, function (err, user) {
                        if(err) throw err;
 
+                       // Check if user to edit is in database
                        if(!user){
                            res.json({success: false, message: 'No user found'});
                        }else{

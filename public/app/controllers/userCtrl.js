@@ -5,16 +5,20 @@ angular.module('userControllers', ['userServices'])
 
     var app = this;
 
+    // Custom function that registers the user in the database
     app.regUser = function (regData, valid) {
         app.loading = true;       // son etat initiale a true c'est a dire present
         app.successMsg = false;   // annulle ou cache le message success apres avoir appuer 2eme fois sur le bouton
         app.errorMsg = false;     // annulle ou cache le message error apres apuit sur le bouton 2eme fois
       console.log('form submitted');
      // console.log(this.regData);
+        // If form is valid and passwords match, attempt to create user
         if(valid){
+            // Runs custom function that registers the user in the database
             User.create(app.regData).then(function (datas) {  // executer la methode qui se trouve dans userServices.js
                 //console.log(datas.data.success); //on parcours et filtre json log en accedant dans data et apres success
                 //console.log(datas.data.message); //on parcours et filtre json log en accedant dans data et apres message
+                // Check if user was saved to database successfully
                 if(datas.data.success){
                     app.loading = false;   // son etat initiale a true apparait et on la cache avec l'etat false
                     app.successMsg = datas.data.message + '...Redirecting...';   // creer success message, si on met this.successMsg ca n'aparaitra pas dans la vue
@@ -35,69 +39,76 @@ angular.module('userControllers', ['userServices'])
 
     // User.checkUsername(regData);
     this.checkUsername = function (regData) {
-        app.checkingUsername = true;
-        app.usernameMsg = false;
-        app.usernameInvalid = false;
+        app.checkingUsername = true; // Start bootstrap loading icon
+        app.usernameMsg = false; // Clear usernameMsg each time user activates ngBlur
+        app.usernameInvalid = false; // Clear usernameInvalid each time user activates ngBlur
+        // Runs custom function that checks if username is available for user to use
         User.checkUsername(app.regData).then(function (datas) {
+            // Check if username is available for the user
             if(datas.data.success){
-                app.checkingUsername = false;
+                app.checkingUsername = false; // Stop bootstrap loading icon
                 app.usernameInvalid = false;
-                app.usernameMsg = datas.data.message;
+                app.usernameMsg = datas.data.message; // If successful, grab message from JSON object
             }else{
-                app.checkingUsername = false;
-                app.usernameInvalid = true;
-                app.usernameMsg = datas.data.message;
+                app.checkingUsername = false; // Stop bootstrap loading icon
+                app.usernameInvalid = true; // User variable to let user know that the chosen username is taken already
+                app.usernameMsg = datas.data.message; // If not successful, grab message from JSON object
             }
         });
     }
 
 
-    //User.checkEmail(regData);
+    // Custom function that checks if e-mail is available for user to use
     this.checkEmail = function (regData) {
-        app.checkingEmail = true;
-        app.emailMsg = false;
-        app.emailInvalid = false;
+        app.checkingEmail = true; // Start bootstrap loading icon
+        app.emailMsg = false; // Clear emailMsg each time user activates ngBlur
+        app.emailInvalid = false; // Clear emailInvalid each time user activates ngBlur
+        // Runs custom function that checks if e-mail is available for user to use
         User.checkEmail(app.regData).then(function (datas) {
+            // Check if e-mail is available for the user
             if(datas.data.success){
-                app.checkingEmail = false;
+                app.checkingEmail = false; // Stop bootstrap loading icon
                 app.emailInvalid = false;
-                app.emailMsg = datas.data.message;
+                app.emailMsg = datas.data.message; // If successful, grab message from JSON object
             }else{
-                app.checkingEmail = false;
-                app.emailInvalid = true;
-                app.emailMsg = datas.data.message;
+                app.checkingEmail = false; // Stop bootstrap loading icon
+                app.emailInvalid = true; // User variable to let user know that the chosen e-mail is taken already
+                app.emailMsg = datas.data.message; // If not successful, grab message from JSON object
             }
         });
     }
 })
 
 
-// verifier les mot de passe si ils ont bn
+// Custom directive to check matching passwords
 .directive('match', function () {
     return {
         restrict : 'A', //A = All metch attributs name
         controller: function ($scope) {
-            $scope.confirmed = false;
-
+            $scope.confirmed = false; // Set matching password to false by default
+            // Custom function that checks both inputs against each other
             $scope.doConfirm = function (values) {
+                // Run as a loop to continue check for each value each time key is pressed
                 values.forEach(function (ele) {
-
+                    // Check if inputs match and set variable in $scope
                     if($scope.confirm == ele){
-                        $scope.confirmed = true;
+                        $scope.confirmed = true; // If inputs match
                     }else{
-                        $scope.confirmed = false;
+                        $scope.confirmed = false; // If inputs do not match
                     }
                 });
             }
         },
         link: function (scope, element, attrs) {
+            // Grab the attribute and observe it
             attrs.$observe('match', function () {
-                scope.matches = JSON.parse(attrs.match);
-                scope.doConfirm(scope.matches);
+                scope.matches = JSON.parse(attrs.match); // Parse to JSON
+                scope.doConfirm(scope.matches); // Run custom function that checks both inputs against each other
             });
+            // Grab confirm ng-model and watch it
             scope.$watch('confirm', function () {
-                scope.matches = JSON.parse(attrs.match);
-                scope.doConfirm(scope.matches);
+                scope.matches = JSON.parse(attrs.match); // Parse to JSON
+                scope.doConfirm(scope.matches); // Run custom function that checks both inputs against each other
             });
         }
     };

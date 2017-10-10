@@ -1,4 +1,5 @@
 angular.module('managementController', [])
+// Controller: User to control the management page and managing of user accounts
 .controller('managementCtrl', function (User, $scope) { //declarer dans routes.js
     var app = this;
 
@@ -7,12 +8,16 @@ angular.module('managementController', [])
     app.errorMsg = false;
     app.editAccess = false; // Show edit button
     app.deleteAccess = false; // Show delete button
-    app.limit = 2;
-    app.searchLimit = 0;
+    app.limit = 2; // Set a default limit to ng-repeat
+    app.searchLimit = 0;  // Set the default search page results limit to zero
 
+    // Function: get all the users from database
     function getUsers() {
+        // Runs function to get all the users from database
         User.getUsers().then(function (datas) {
+            // Check if able to get data from database
             if(datas.data.success){
+                // Check which permissions the logged in user has
                 if(datas.data.permission == 'admin' || datas.data.permission == 'moderator'){
                     app.users = datas.data.users; // Assign users from database to variable
                     app.loading = false; // Stop loading icon
@@ -22,72 +27,80 @@ angular.module('managementController', [])
                     if (datas.data.permission === 'admin') {
                         app.editAccess = true; // Show edit button
                         app.deleteAccess = true; // Show delete button
+                    // Check if logged in user is an admin or moderator
                     } else if (datas.data.permission === 'moderator') {
                         app.editAccess = true; // Show edit button
                     }
                 }else {
-                    app.errorMsg = 'Insuffisant permission';
-                    app.loading = false; //loading vue
+                    app.errorMsg = 'Insufficient Permissions'; // Reject edit and delete options
+                    app.loading = false; // Stop loading icon
                 }
             }else{
-                app.errorMsg = datas.data.message;
-                app.loading = false; //loading vue
+                app.errorMsg = datas.data.message; // Set error message
+                app.loading = false; // Stop loading icon
             }
         });
     }
-    getUsers();
+    getUsers(); // Invoke function to get users from databases
 
     //Permet de filter les utilisateurs en function de chiffre quon a saisi
-    app.showMore = function (number) {
-        app.showMoreError = false;
-        if(number > 0){
-            app.limit = number;
-        }else{
-            app.showMoreError = 'Please enter a number';
+    // Function: Show more results on page
+    app.showMore = function(number) {
+        app.showMoreError = false; // Clear error message
+        // Run functio only if a valid number above zero
+        if (number > 0) {
+            app.limit = number; // Change ng-repeat filter to number requested by user
+        } else {
+            app.showMoreError = 'Please enter a valid number'; // Return error if number not valid
         }
     };
     // afficher tous les utilisateurs
-    app.showAll = function () {
-        app.limit = undefined;
-        app.showMoreError = false;
+    // Function: Show all results on page
+    app.showAll = function() {
+        app.limit = undefined; // Clear ng-repeat limit
+        app.showMoreError = false; // Clear error message
     };
 
-    app.deleteUser = function (username) {
-        User.deleteUser(username).then(function (datas) {
-           if(datas.data.success){
-                getUsers();
-           } else{
-               app.showMoreError = datas.data.message;
-           }
+    // Function: Delete a user
+    app.deleteUser = function(username) {
+        // Run function to delete a user
+        User.deleteUser(username).then(function(datas) {
+            // Check if able to delete user
+            if (datas.data.success) {
+                getUsers(); // Reset users on page
+            } else {
+                app.showMoreError = datas.data.message; // Set error message
+            }
         });
     };
 
     //Filter *********************************************************************************************
-    app.search = function(searchKeyword, number){
-
-        if(searchKeyword){
-
-            if(searchKeyword.length > 0){
-                app.limit = 0;
-                $scope.searchFilter = searchKeyword;
-                app.limit = number;
-            }else{
-                $scope.searchFilter = undefined;
-                app.limit = 0;
+    // Function: Perform a basic search function
+    app.search = function(searchKeyword, number) {
+        // Check if a search keyword was provided
+        if (searchKeyword) {
+            // Check if the search keyword actually exists
+            if (searchKeyword.length > 0) {
+                app.limit = 0; // Reset the limit number while processing
+                $scope.searchFilter = searchKeyword; // Set the search filter to the word provided by the user
+                app.limit = number; // Set the number displayed to the number entered by the user
+            } else {
+                $scope.searchFilter = undefined; // Remove any keywords from filter
+                app.limit = 0; // Reset search limit
             }
-
-        }else{
-            $scope.searchFilter = undefined;
-            app.limit = 0;
+        } else {
+            $scope.searchFilter = undefined; // Reset search limit
+            app.limit = 0; // Set search limit to zero
         }
     };
 
-    app.clear = function(){
-        $scope.number = 'Clear';
-        app.limit = 0;
-        $scope.searchKeyword = undefined;
-        $scope.searchFilter = undefined;
-        app.showMoreError = false;
+    // Function: Clear all fields
+    app.clear = function() {
+        $scope.number = 'Clear'; // Set the filter box to 'Clear'
+        app.limit = 0; // Clear all results
+        $scope.searchKeyword = undefined; // Clear the search word
+        $scope.searchFilter = undefined; // Clear the search filter
+        app.showMoreError = false; // Clear any errors
     };
 
     // Function: Perform an advanced, criteria-based search
